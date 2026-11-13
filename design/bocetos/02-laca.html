@@ -1,0 +1,246 @@
+<title>Laca Presupuesto Uñas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Plan: página neutra; el boceto lleva pintura plana (sin degradados), un color por servicio, total centrado en redondeada del sistema.
+   Objeto firma: la muestra de uña que se «pinta» al elegirla (se rellena de abajo hacia arriba). */
+:root{
+  --bg:#F1F2F0; --fg:#1A1D1B; --mut:#5B625E; --line:rgba(26,29,27,.14); --chip:#E2E5E2; --chipon:#1A1D1B; --chipfg:#F1F2F0;
+  --ui:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121413; --fg:#ECEFEC; --mut:#9AA29E; --line:rgba(236,239,236,.16); --chip:#222624; --chipon:#ECEFEC; --chipfg:#121413; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121413; --fg:#ECEFEC; --mut:#9AA29E; --line:rgba(236,239,236,.16); --chip:#222624; --chipon:#ECEFEC; --chipfg:#121413; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:15px;line-height:1.45;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+.wrap{max-width:460px;margin:0 auto}
+h1{font-size:22px;line-height:1.2;margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance}
+.sub{margin:0 0 14px;color:var(--mut);font-size:14px}
+.seg{display:grid;gap:6px;margin-bottom:12px}
+.seg.c3{grid-template-columns:1fr 1fr}
+.seg button{min-height:44px;border-radius:14px;background:var(--chip);font-size:14px;font-weight:700;line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background-color .25s,color .25s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.seg button small{font-weight:500;font-size:11px;opacity:.7}
+.seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--chipon);color:var(--chipfg)}
+.seg button:active{transform:scale(.96)}
+.ficha{margin:22px 2px 0;display:grid;gap:12px}
+.ficha h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 3px;font-weight:700}
+.ficha p,.ficha ul{margin:0}
+.ficha ul{padding-left:18px;display:grid;gap:4px}
+.foot{margin:24px 2px 0;color:var(--mut);font-size:12.5px}
+
+/* ===== teléfono ===== */
+.ph{--bg:#F3F1EE;--ink:#1D1B1A;--mute:#6E6864;--chip:#E6E2DD;--line:rgba(29,27,26,.16);--btn:#1D1B1A;--btnfg:#F3F1EE;
+  position:relative;width:min(100%,372px);height:704px;margin:0 auto;border-radius:46px;overflow:hidden;box-shadow:0 0 0 7px #0d0e0e,0 26px 50px -18px rgba(0,0,0,.55);isolation:isolate;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  background:var(--bg);color:var(--ink);font-family:var(--ui);transition:background-color .4s,color .4s}
+.ph[data-mode="dark"]{--bg:#151315;--ink:#F3F1EE;--mute:#A8A19C;--chip:#262327;--line:rgba(243,241,238,.2);--btn:#F3F1EE;--btnfg:#151315}
+.isl{position:absolute;top:11px;left:50%;width:96px;height:27px;margin-left:-48px;border-radius:14px;background:#050505;z-index:20}
+.in{position:absolute;inset:0;display:flex;flex-direction:column;padding:60px 20px 18px}
+.lbl{text-align:center;font-size:13px;color:var(--mute);letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.tot{text-align:center;font-size:84px;line-height:1;margin-top:6px;font-weight:800;letter-spacing:-.045em;font-variant-numeric:tabular-nums;touch-action:manipulation}
+.gan{align-self:center;margin-top:8px;height:26px;padding:0 12px;border-radius:13px;background:var(--ink);color:var(--bg);font-size:14px;font-weight:700;display:grid;place-items:center;opacity:0;transform:translateY(4px);transition:opacity .25s,transform .35s cubic-bezier(.16,1,.3,1)}
+.gan.on{opacity:1;transform:none}
+.stage{position:relative;margin-top:18px;flex:1;min-height:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px;align-content:start}
+.tip{position:relative;display:block;width:100%;height:152px;border-radius:54px 54px 20px 20px/70px 70px 20px 20px;border:3px solid var(--c);overflow:hidden;color:var(--ink);text-align:center;transform:translateY(0);transition:transform .5s cubic-bezier(.3,1.45,.5,1)}
+.tip .fill{position:absolute;inset:-1px;background:var(--c);transform-origin:50% 100%;transform:scaleY(var(--f,0));transition:transform .6s cubic-bezier(.3,1.15,.5,1)}
+.tip .hl{position:absolute;left:18%;top:9%;width:15%;height:34%;border-radius:8px;background:#fff;opacity:.4;transform:rotate(12deg)}
+.tip .nm,.tip .pr{position:absolute;left:4px;right:4px;transition:color .25s;color:var(--ink)}
+.tip .nm{bottom:30px;font-size:12px;font-weight:800;line-height:1.1;letter-spacing:-.01em}
+.tip .pr{bottom:12px;font-size:13px;font-weight:600;opacity:.85}
+.tip.dk .nm,.tip.dk .pr{color:var(--t,#fff)}
+.tip.on{transform:translateY(-8px)}
+.tip:active{transform:scale(.96)}
+.tip .bd{position:absolute;top:10px;left:50%;margin-left:-14px;min-width:28px;height:28px;padding:0 7px;border-radius:14px;background:var(--bg);color:var(--ink);font-size:14px;font-weight:800;display:grid;place-items:center;transform:scale(0);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:2}
+.tip.on .bd{transform:scale(1)}
+.sum{margin-top:10px;padding:0 14px;border-radius:18px;background:var(--chip);font-size:14px;font-weight:600;color:var(--mute);min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center;transition:background-color .4s}
+.share{margin-top:10px;min-height:54px;border-radius:27px;background:var(--btn);color:var(--btnfg);font-size:17px;font-weight:800;transition:transform .3s cubic-bezier(.34,1.56,.64,1),background-color .4s,color .4s}
+.share:active{transform:scale(.97)}
+.dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.dots i{width:20px;height:6px;border-radius:3px;background:var(--ink);opacity:.22}.dots i:first-child{opacity:.9}
+.toast{position:absolute;left:50%;bottom:64px;transform:translate(-50%,12px);padding:9px 14px;border-radius:14px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .25s,transform .4s cubic-bezier(.16,1,.3,1);z-index:15;white-space:nowrap;background:var(--ink);color:var(--bg)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.bub{position:absolute;z-index:6;min-width:54px;height:54px;padding:0 14px;border-radius:27px;background:var(--ink);color:var(--bg);font-size:30px;font-weight:800;display:grid;place-items:center;pointer-events:none;font-variant-numeric:tabular-nums;animation:bpop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bpop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.tip.drag .fill{transition:transform .1s linear}
+.tip.drag{transform:translateY(-8px) scale(1.03)}
+.ph[data-input="drag"] .tip.pn{touch-action:none}
+.scr{position:absolute;inset:0;z-index:8;background:rgba(0,0,0,.18);animation:sin .25s ease}
+@keyframes sin{from{opacity:0}to{opacity:1}}
+.pkr{position:absolute;z-index:10;width:250px;padding:10px;border-radius:24px;background:var(--bg);box-shadow:0 0 0 2px var(--ink),0 22px 36px -14px rgba(0,0,0,.5);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;animation:ppop .35s cubic-bezier(.34,1.56,.64,1);transform-origin:center}
+@keyframes ppop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.pkr button{height:44px;border-radius:14px;background:var(--chip);font-size:18px;font-weight:800;transition:transform .2s cubic-bezier(.34,1.56,.64,1),background-color .2s,color .2s}
+.pkr button:active{transform:scale(.92)}
+.pkr button[aria-pressed="true"]{background:var(--c);color:var(--t,#fff)}
+.pkr .clr{grid-column:1/-1;height:38px;font-size:14px;font-weight:700;background:none;color:var(--mute)}
+.pkr[hidden],.scr[hidden],.bub[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+  <h1>Laca, cómo contar las uñas</h1>
+  <p class="sub">Prueba las dos formas con «Diseño por uña» y «Piedra por uña». Mantén pulsado el total para ver cuánto gana. Precios de ejemplo.</p>
+
+  <div class="seg c3" role="group" aria-label="Cómo contar">
+    <button id="ia" aria-pressed="true">1 · Arrastrar<small>pinta hasta donde llegues</small></button>
+    <button id="ib" aria-pressed="false">2 · Elegir número<small>toca y escoge de 1 a 10</small></button>
+  </div>
+  <div class="seg c3" aria-label="Ambiente">
+    <button id="mL" aria-pressed="true">Claro</button>
+    <button id="mD" aria-pressed="false">Oscuro</button>
+  </div>
+
+  <div class="ph" id="ph" data-mode="light">
+    <div class="isl"></div>
+    <div class="in">
+      <div class="lbl">Total</div>
+      <div class="tot" id="tot" aria-live="polite">$0</div>
+      <div class="gan" id="gan"></div>
+      <div class="stage" id="stage">
+        <div class="grid" id="grid"></div>
+        <div class="bub" id="bub" hidden aria-hidden="true"></div>
+      </div>
+      <div class="sum" id="sum">Toca las muestras para armar el trabajo.</div>
+      <button type="button" class="share" id="share">Compartir</button>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="scr" id="scr" hidden></div>
+    <div class="pkr" id="pkr" role="group" aria-label="Cuántas uñas" hidden></div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <div class="ficha">
+    <div><h2>1 · Arrastrar</h2>
+      <ul>
+        <li><b>Un toque</b> en una muestra vacía la pinta con <b>todas</b> las uñas (o con lo de la última vez). Otro toque la vacía.</li>
+        <li><b>Arrastra hacia arriba o abajo</b> sobre la muestra: se pinta hasta donde llegue el dedo y una burbuja grande te dice cuántas son.</li>
+        <li>Una uña con diseño en la mano izquierda, otra… ya no hace falta: son un toque o un arrastre.</li>
+      </ul></div>
+    <div><h2>2 · Elegir número</h2>
+      <ul>
+        <li>Toca la muestra y aparece una cuadrícula pequeña del 1 al 10, como la de los días en Alcancía. Dos toques para cualquier cantidad.</li>
+        <li>Es más fácil de descubrir y más exacto; el arrastre es más rápido y más «pintar».</li>
+      </ul></div>
+    <div><h2>Lo que mantiene</h2><p>La muestra sigue siendo una uña que se pinta de abajo hacia arriba. Los servicios que no son por uña (semipermanente, acrílico, gel, retiro) siguen con un solo toque.</p></div>
+  </div>
+  <p class="foot">Precios y costos de ejemplo. Ninguna cifra es real.</p>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var money=function(n){return '$'+Math.round(n).toLocaleString('en-US')};
+  /* ejemplo: clave, nombre, precio, costo, color plano, texto sobre el color, tipo (0 base, 1 por uña, 2 extra) */
+  var TIPS=[
+    ['sp','Semipermanente',900,250,'#2447D6','#fff',0],
+    ['ac','Acrílico',1500,450,'#0C9A98','#fff',0],
+    ['ge','Gel',1200,350,'#9B3DB5','#fff',0],
+    ['di','Diseño por uña',80,15,'#E5503F','#fff',1],
+    ['pi','Piedra por uña',40,10,'#E9A410','#2A1B00',1],
+    ['re','Retiro',300,40,'#4D9B2B','#fff',2]];
+  var BY={};TIPS.forEach(function(t){BY[t[0]]=t});
+  var S={base:'sp',n:{di:4,pi:0},re:false,shown:0,input:'drag',last:{di:10,pi:10}};
+
+  $('grid').innerHTML=TIPS.map(function(t){
+    return '<button type="button" class="tip'+(t[6]===1?' pn':'')+'" data-k="'+t[0]+'" style="--c:'+t[4]+';--t:'+t[5]+'" aria-pressed="false"><span class="fill"><i class="hl"></i></span><span class="bd"></span><span class="nm">'+t[1]+'</span><span class="pr">'+money(t[2])+'</span></button>';
+  }).join('');
+
+  function frac(t){
+    if(t[6]===0)return S.base===t[0]?1:0;
+    if(t[6]===2)return S.re?1:0;
+    var n=S.n[t[0]]||0;return n?.25+.75*n/10:0;
+  }
+  function tween(el,from,to,ms){
+    if(RM||from===to){el.textContent=money(to);return}
+    var t0=performance.now();cancelAnimationFrame(el.__r);
+    (function step(t){var p=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-p,4);el.textContent=money(from+(to-from)*e);if(p<1)el.__r=requestAnimationFrame(step)})(t0);
+  }
+  function calc(){
+    var t=0,c=0,parts=[];
+    TIPS.forEach(function(x){
+      if(x[6]===0&&S.base===x[0]){t+=x[2];c+=x[3];parts.push(x[1])}
+      if(x[6]===1&&S.n[x[0]]){t+=x[2]*S.n[x[0]];c+=x[3]*S.n[x[0]];parts.push(S.n[x[0]]+(x[0]==='di'?' con diseño':' con piedra'))}
+      if(x[6]===2&&S.re){t+=x[2];c+=x[3];parts.push('retiro')}
+    });
+    return {t:t,g:t-c,p:parts};
+  }
+  function hint(){return S.input==='drag'?'Toca una muestra de «por uña» para pintar todas. Arrastra para elegir cuántas.':'Toca las muestras para armar el trabajo.'}
+  function paint(){
+    TIPS.forEach(function(x){
+      var el=$('grid').querySelector('.tip[data-k="'+x[0]+'"]'),f=frac(x),on=f>0;
+      el.style.setProperty('--f',f);el.classList.toggle('on',on);el.classList.toggle('dk',f>=.25);el.setAttribute('aria-pressed',on?'true':'false');
+      var bd=el.querySelector('.bd'),v=x[6]===1?(S.n[x[0]]||''):'✓';if(bd.textContent!==String(v))bd.textContent=v;
+    });
+    var r=calc();tween($('tot'),S.shown,r.t,450);S.shown=r.t;$('gan').textContent='Ganas '+money(r.g);
+    $('sum').textContent=r.p.length?r.p.join(' · '):hint();
+  }
+
+  /* ---- 1 · arrastrar ---- */
+  var D=null,lastDrag=0;
+  function bubShow(b,n){
+    var bub=$('bub'),st=$('stage').getBoundingClientRect(),r=b.getBoundingClientRect();
+    bub.hidden=false;bub.textContent=n;
+    bub.style.left=Math.max(0,Math.min(st.width-bub.offsetWidth,r.left-st.left+r.width/2-bub.offsetWidth/2))+'px';
+    bub.style.top=Math.max(-6,r.top-st.top-64)+'px';
+  }
+  $('grid').addEventListener('pointerdown',function(e){
+    if(S.input!=='drag')return;var b=e.target.closest('.tip.pn');if(!b)return;
+    D={b:b,k:b.dataset.k,y0:e.clientY,id:e.pointerId,moved:false,start:S.n[b.dataset.k]||0};
+    try{b.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  $('grid').addEventListener('pointermove',function(e){
+    if(!D||e.pointerId!==D.id)return;
+    if(!D.moved){if(Math.abs(e.clientY-D.y0)<10)return;D.moved=true;D.b.classList.add('drag')}
+    var r=D.b.getBoundingClientRect(),n=Math.max(0,Math.min(10,Math.round((1-(e.clientY-r.top)/r.height)*10)));
+    if(n!==(S.n[D.k]||0)){S.n[D.k]=n;if(n)S.last[D.k]=n;paint();var bub=$('bub');bub.style.animation='none';void bub.offsetWidth;bub.style.animation=''}
+    bubShow(D.b,S.n[D.k]||0);
+  });
+  function endDrag(e){
+    if(!D||e.pointerId!==D.id)return;var d=D;D=null;d.b.classList.remove('drag');$('bub').hidden=true;lastDrag=Date.now();
+    if(!d.moved&&e.type==='pointerup'){S.n[d.k]=d.start>0?0:(S.last[d.k]||10);paint()}
+  }
+  $('grid').addEventListener('pointerup',endDrag);$('grid').addEventListener('pointercancel',endDrag);
+
+  /* ---- 2 · elegir número ---- */
+  var PK=null;
+  function closePk(){PK=null;$('pkr').hidden=true;$('scr').hidden=true}
+  function openPk(b){
+    var k=b.dataset.k,x=BY[k],pk=$('pkr'),h='';
+    PK=k;pk.style.setProperty('--c',x[4]);pk.style.setProperty('--t',x[5]);
+    for(var i=1;i<=10;i++)h+='<button type="button" data-n="'+i+'" aria-pressed="'+((S.n[k]||0)===i?'true':'false')+'">'+i+'</button>';
+    h+='<button type="button" class="clr" data-n="0">Quitar</button>';
+    pk.innerHTML=h;pk.hidden=false;$('scr').hidden=false;
+    var ph=$('ph').getBoundingClientRect(),r=b.getBoundingClientRect(),w=pk.offsetWidth,hh=pk.offsetHeight;
+    pk.style.left=Math.max(10,Math.min(ph.width-w-10,r.left-ph.left+r.width/2-w/2))+'px';
+    pk.style.top=Math.max(70,Math.min(ph.height-hh-20,r.top-ph.top+r.height/2-hh/2))+'px';
+  }
+  $('pkr').addEventListener('click',function(e){var b=e.target.closest('button');if(!b||!PK)return;var n=+b.dataset.n;S.n[PK]=n;if(n)S.last[PK]=n;closePk();paint()});
+  $('scr').addEventListener('click',closePk);
+
+  $('grid').addEventListener('click',function(e){
+    var b=e.target.closest('.tip');if(!b)return;var k=b.dataset.k,x=BY[k];
+    if(x[6]===1){if(S.input==='drag')return;openPk(b);return}
+    if(x[6]===0)S.base=S.base===k?null:k;else S.re=!S.re;
+    paint();
+  });
+
+  function setInput(m){S.input=m;closePk();$('ph').dataset.input=m;$('ia').setAttribute('aria-pressed',m==='drag'?'true':'false');$('ib').setAttribute('aria-pressed',m==='pick'?'true':'false');paint()}
+  $('ia').addEventListener('click',function(){setInput('drag')});$('ib').addEventListener('click',function(){setInput('pick')});
+
+  /* ver cuánto gana: mantener pulsado el total */
+  var tm=0;
+  $('tot').addEventListener('pointerdown',function(){tm=setTimeout(function(){$('gan').classList.add('on');tm=setTimeout(function(){$('gan').classList.remove('on')},2400)},420)});
+  ['pointerup','pointerleave','pointercancel'].forEach(function(e){$('tot').addEventListener(e,function(){clearTimeout(tm)})});
+
+  $('share').addEventListener('click',function(){
+    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText('Total '+money(calc().t)).catch(function(){})}catch(e){}
+    var t=$('toast');t.textContent='Aquí elegiría texto o imagen';t.classList.add('on');clearTimeout(t.__t);t.__t=setTimeout(function(){t.classList.remove('on')},1800);
+  });
+  function setTheme(d){$('ph').dataset.mode=d?'dark':'light';$('mL').setAttribute('aria-pressed',d?'false':'true');$('mD').setAttribute('aria-pressed',d?'true':'false')}
+  $('mL').addEventListener('click',function(){setTheme(false)});$('mD').addEventListener('click',function(){setTheme(true)});
+  $('ph').dataset.input='drag';paint();
+})();
+</script>
