@@ -120,3 +120,5 @@ Guardados en el teléfono (`localStorage`, clave `laca.v1`), validados al cargar
 - **Fondo:** esmalte marmoleado en tonos de violeta (mismo motor que Precios, una sola paleta, ~30 cuadros por segundo, se detiene fuera de esta pantalla).
 - **Vacío:** un abanico de uñas que respira y «Aquí aparecen los presupuestos que compartas, para repetirlos con un toque».
 - **Pendiente (idea del boceto 3):** «De siempre», una fila con los presupuestos que más se repiten.
+
+- **Indicador de pantallas:** puntos redondos; el de la pantalla actual se alarga en una línea redondeada (22×8 px) y se ve completo, los demás al 30 %.
