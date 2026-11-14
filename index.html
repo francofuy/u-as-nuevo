@@ -154,7 +154,7 @@ canvas.wash{width:100%;height:100%;display:block}
 .still .pr-row{animation:none}
 .pr-row.fresh{animation:rnew .6s cubic-bezier(.3,1.3,.5,1)}
 @keyframes rnew{from{opacity:0;transform:translateX(-18px) scale(.97)}to{opacity:1;transform:none}}
-.trk{position:relative;height:48px;border-radius:24px;background:var(--trk,rgba(255,255,255,.34));overflow:hidden;cursor:pointer;outline:none}
+.trk{position:relative;height:48px;border-radius:24px;background:var(--trk,rgba(255,255,255,.34));overflow:hidden;cursor:pointer;outline:none;touch-action:none}
 .trk:focus-visible{box-shadow:0 0 0 3px var(--ink)}
 .fl{position:absolute;left:0;top:0;bottom:0;width:var(--w,50%);border-radius:24px;background:var(--c);transition:width .4s cubic-bezier(.3,1.2,.5,1),background-color .3s;box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.75)}
 .cs{position:absolute;left:0;top:0;bottom:0;width:var(--cw,20%);background:rgba(0,0,0,.26);border-radius:24px 0 0 24px;transition:width .4s cubic-bezier(.3,1.2,.5,1)}
@@ -778,9 +778,9 @@ canvas.wash{width:100%;height:100%;display:block}
   /* ================= PRECIOS: barras de esmalte ================= */
   var pricesDrawn=false;
   var GROUPS=[['b','SERVICIOS'],['n','UÑAS · POR UÑA'],['e','EXTRAS']];
-  function groupMax(k){return Math.max.apply(null,D.svc.filter(function(x){return x.k===k}).map(function(x){return x.p}).concat([1]))*1.12}
+  function groupMax(k){return Math.max.apply(null,D.svc.filter(function(x){return x.k===k}).map(function(x){return x.p}).concat([1]))*1.35}
   var BD=null;
-  function pctOf(x){var m=(BD&&BD.x.k===x.k)?BD.mx:groupMax(x.k);return Math.max(26,Math.min(100,Math.sqrt(x.p/m)*100))}
+  function pctOf(x){var m=(BD&&BD.x.k===x.k)?Math.max(BD.mx,BD.x.p):groupMax(x.k);return Math.max(26,Math.min(100,Math.sqrt(x.p/m)*100))}
   function gainTxt(x){return 'ganas '+(x.p?Math.max(0,Math.round((1-x.c/x.p)*100)):0)+' %'}
   function rowHtml(x,i,isNew){
     return '<div class="pr-row'+(isNew?' fresh':'')+'" data-id="'+x.id+'" style="--i:'+Math.min(i,12)+';--c:var(--s'+x.s+')'+(DARKTXT[x.s]?';--t:#2A1B00':'')+'">'+
@@ -822,19 +822,34 @@ canvas.wash{width:100%;height:100%;display:block}
   /* arrastrar una barra: el precio sube o baja con saltos de $5, $10 o $50 */
   function bubb(x,y,txt){var b=$('bubb');if(!b){b=document.createElement('div');b.id='bubb';b.className='bubb';document.body.appendChild(b)}b.textContent=txt;b.style.left=Math.max(40,Math.min(innerWidth-40,x))+'px';b.style.top=Math.max(8,y)+'px'}
   function bubbHide(){var b=$('bubb');if(b)b.remove()}
+  /* la barra se queda con todo el gesto (touch-action:none) para que el dedo no la suelte a medias; la app decide la dirección:
+     horizontal = precio, vertical = desplaza la lista (con inercia) */
   $('plist').addEventListener('pointerdown',function(e){
     var t=e.target.closest('.trk');if(!t)return;var r=t.parentNode,x=BY[r.dataset.id];if(!x)return;
-    BD={r:r,x:x,x0:e.clientX,p0:x.p||10,pid:e.pointerId,moved:false,w:t.getBoundingClientRect().width,mx:groupMax(x.k),start:x.p};
+    BD={r:r,x:x,x0:e.clientX,y0:e.clientY,p0:x.p||10,pid:e.pointerId,moved:false,mode:null,w:t.getBoundingClientRect().width,mx:groupMax(x.k),start:x.p,sc0:$('plist').scrollTop,ly:e.clientY,lt:e.timeStamp,vy:0};
   });
   $('plist').addEventListener('pointermove',function(e){
     if(!BD||e.pointerId!==BD.pid)return;
-    if(!BD.moved){if(Math.abs(e.clientX-BD.x0)<8)return;BD.moved=true;BD.r.classList.add('drag');try{$('plist').setPointerCapture(e.pointerId)}catch(_){}}
+    if(!BD.mode){
+      var ax=Math.abs(e.clientX-BD.x0),ay=Math.abs(e.clientY-BD.y0);if(Math.max(ax,ay)<8)return;
+      BD.mode=ax>=ay*.75?'h':'v';try{$('plist').setPointerCapture(e.pointerId)}catch(_){}
+      if(BD.mode==='h'){BD.moved=true;BD.r.classList.add('drag')}
+    }
+    if(BD.mode==='v'){
+      var dt=e.timeStamp-BD.lt;if(dt>0)BD.vy=.8*BD.vy+.2*((e.clientY-BD.ly)/dt);BD.ly=e.clientY;BD.lt=e.timeStamp;
+      $('plist').scrollTop=BD.sc0-(e.clientY-BD.y0);return;
+    }
     var raw=BD.p0*Math.exp(1.5*(e.clientX-BD.x0)/BD.w),step=raw<100?5:raw<500?10:50;
     BD.x.p=Math.max(step,Math.round(raw/step)*step);updBars();
     bubb(e.clientX,BD.r.getBoundingClientRect().top-54,money(BD.x.p));
   });
   function endDrag(e){
     if(!BD||e.pointerId!==BD.pid)return;var d=BD;BD=null;d.r.classList.remove('drag');bubbHide();
+    if(d.mode==='v'){
+      var v=d.vy,l=$('plist');
+      if(e.type==='pointerup'&&Math.abs(v)>.15)(function inertia(){if(Math.abs(v)<.02)return;l.scrollTop-=v*16;v*=.95;requestAnimationFrame(inertia)})();
+      return;
+    }
     if(d.moved&&e.type==='pointerup'){if(d.x.p!==d.start)touchedPrices();else updBars()}
     else if(d.moved){d.x.p=d.start;updBars()}
   }
